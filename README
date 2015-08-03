@@ -1,0 +1,12 @@
+
+Counter for Pebble by Cristian Gonzalez
+
+#######################################################
+
+Counter is a simple digital counter for the Pebble watch platform. The count is displayed in the main window. The count can be either increased or decreased. (Last Updated 8/3/15)
+
+#######################################################
+
+Controls:
+UPBtn:  +1 count
+DWNBtn: -1 count
