@@ -2,33 +2,22 @@
 
 static Window *window;
 static TextLayer *text_layer;
-int *count;
+int count;
 
 char *itoa(int num){
   static char buff[20] = {};
   int i = 0, temp_num = num, length = 0;
-  char *string = buff;
-
-  APP_LOG(APP_LOG_LEVEL_DEBUG, "Finished variable init.");
+  char *string = buff;;
 
   // count how many characters in the number
   if(num >= 0) {
-
-    APP_LOG(APP_LOG_LEVEL_DEBUG, "In IF loop.");
-
     while(temp_num) {
-
-      APP_LOG(APP_LOG_LEVEL_DEBUG, "In WHILE loop.");
-
       temp_num /= 10;
       length++;
     }
 
     // assign the number to the buffer starting at the end of the number
     for(i = 0; i < length; i++) {
-
-      APP_LOG(APP_LOG_LEVEL_DEBUG, "In FOR loop.");
-
       buff[(length-1)-i] = '0' + (num % 10);
       num /= 10;
     }
@@ -45,12 +34,12 @@ static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
 
 static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
   count++;
-  text_layer_set_text(text_layer, itoa(*count));
+  text_layer_set_text(text_layer, itoa(count));
 }
 
 static void down_click_handler(ClickRecognizerRef recognizer, void *context) {
   count--;
-  text_layer_set_text(text_layer, itoa(*count));
+  text_layer_set_text(text_layer, itoa(count));
 }
 
 static void click_config_provider(void *context) {
