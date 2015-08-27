@@ -4,11 +4,23 @@ static Window *window;
 static TextLayer *customFontTextLayer;
 static GFont counterFont;
 int count;
+bool neg;
+// check if negative
+void chekNeg(int num){
+  if(num < 0){
+    num = abs(num);
+    neg = true;
+  }else{
+    neg = false;
+  }
+}
 
 char *itoa(int num){
   static char buff[20] = {};
   int i = 0, temp_num = num, length = 0;
-  char *string = buff;;
+  char *string = buff;
+
+  chekNeg(num);
 
   // count how many characters in the number
   if(num >= 0) {
