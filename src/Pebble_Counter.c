@@ -5,25 +5,16 @@ static TextLayer *customFontTextLayer;
 static GFont counterFont;
 int count;
 bool neg;
-// check if negative
-void chekNeg(int num){
-  if(num < 0){
-    num = abs(num);
-    neg = true;
-  }else{
-    neg = false;
-  }
-}
 
 char *itoa(int num){
   static char buff[20] = {};
   int i = 0, temp_num = num, length = 0;
   char *string = buff;
 
-  chekNeg(num);
-
   // count how many characters in the number
-  if(num >= 0) {
+  if(num >= 0) {  // positive
+    neg = false;
+
     while(temp_num) {
       temp_num /= 10;
       length++;
@@ -35,9 +26,24 @@ char *itoa(int num){
       num /= 10;
     }
     buff[i] = '\0'; // can't forget the null byte to properly end our string
-  }else{
-    return "Unsupported Number";
+  }else{          // negative
+    neg = true;
+    temp_num = num;
+    num = abs(temp_num);
+
+    while(temp_num) {
+      temp_num /= 10;
+      length++;
+    }
+
+    // assign the number to the buffer starting at the end of the number
+    for(i = 0; i < length; i++) {
+      buff[(length-1)-i] = '0' + (num % 10);
+      num /= 10;
+    }
+    buff[i] = '\0'; // can't forget the null byte to properly end our string
   }
+
   return string;
 }
 
@@ -67,7 +73,6 @@ static void window_load(Window *window) {
   count = 0;
 
   customFontTextLayer = text_layer_create(GRect(0, 50, 144, 50));
-
   text_layer_set_background_color(customFontTextLayer, GColorClear);
   counterFont = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_XPED_48));
   layer_add_child(window_layer, text_layer_get_layer(customFontTextLayer));
