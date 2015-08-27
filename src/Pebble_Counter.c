@@ -1,7 +1,8 @@
 #include <pebble.h>
 
 static Window *window;
-static TextLayer *text_layer;
+static TextLayer *customFontTextLayer;
+static GFont counterFont;
 int count;
 
 char *itoa(int num){
@@ -34,12 +35,12 @@ static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
 
 static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
   count++;
-  text_layer_set_text(text_layer, itoa(count));
+  text_layer_set_text(customFontTextLayer, itoa(count));
 }
 
 static void down_click_handler(ClickRecognizerRef recognizer, void *context) {
   count--;
-  text_layer_set_text(text_layer, itoa(count));
+  text_layer_set_text(customFontTextLayer, itoa(count));
 }
 
 static void click_config_provider(void *context) {
@@ -53,15 +54,19 @@ static void window_load(Window *window) {
   GRect bounds = layer_get_bounds(window_layer);
   count = 0;
 
+  customFontTextLayer = text_layer_create(GRect(0, 50, 144, 50));
 
-  text_layer = text_layer_create((GRect) { .origin = { 0, 72 }, .size = { bounds.size.w, 20 } });
-  text_layer_set_text(text_layer, "0");
-  text_layer_set_text_alignment(text_layer, GTextAlignmentCenter);
-  layer_add_child(window_layer, text_layer_get_layer(text_layer));
+  text_layer_set_background_color(customFontTextLayer, GColorClear);
+  counterFont = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_XPED_48));
+  layer_add_child(window_layer, text_layer_get_layer(customFontTextLayer));
+  text_layer_set_font(customFontTextLayer, counterFont);
+  text_layer_set_text(customFontTextLayer, "0");
+  text_layer_set_text_alignment(customFontTextLayer, GTextAlignmentCenter);
 }
 
 static void window_unload(Window *window) {
-  text_layer_destroy(text_layer);
+  fonts_unload_custom_font(counterFont);
+  text_layer_destroy(customFontTextLayer);
 }
 
 static void init(void) {
