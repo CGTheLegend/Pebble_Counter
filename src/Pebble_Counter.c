@@ -12,7 +12,7 @@ char *itoa(int num){
   char *string = buff;
 
   // count how many characters in the number
-  if(num >= 0) {  // positive
+  if(num > 0) {  // positive
     neg = false;
 
     while(temp_num) {
@@ -26,7 +26,7 @@ char *itoa(int num){
       num /= 10;
     }
     buff[i] = '\0'; // can't forget the null byte to properly end our string
-  }else{          // negative
+  }else if(num < 0){          // negative
     neg = true;
     temp_num = num;
     num = abs(temp_num);
@@ -42,6 +42,8 @@ char *itoa(int num){
       num /= 10;
     }
     buff[i] = '\0'; // can't forget the null byte to properly end our string
+  }else{
+    string = "0";
   }
 
   return string;
