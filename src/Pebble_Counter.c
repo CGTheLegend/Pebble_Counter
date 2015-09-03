@@ -2,9 +2,19 @@
 
 static Window *window;
 static TextLayer *customFontTextLayer;
+static Layer *draw_layer;
 static GFont counterFont;
+GContext *ctx;
 int count;
 bool neg;
+
+static void update_draw_proc(Layer *draw_layer, GContext *ctx){
+  // Draw something here using ctx
+  GPoint p0 = GPoint(10, 72);
+  GPoint p1 = GPoint(20, 72);
+  graphics_context_set_stroke_color(ctx, GColorBlack);
+  graphics_draw_line(ctx, p0, p1);
+}
 
 char *itoa(int num){
   static char buff[20] = {};
@@ -45,7 +55,6 @@ char *itoa(int num){
   }else{
     string = "0";
   }
-
   return string;
 }
 
@@ -55,11 +64,17 @@ static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
 
 static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
   count++;
+  if(count < 0){
+    update_draw_proc(draw_layer, ctx);
+  }
   text_layer_set_text(customFontTextLayer, itoa(count));
 }
 
 static void down_click_handler(ClickRecognizerRef recognizer, void *context) {
   count--;
+  if(count < 0){
+    update_draw_proc(draw_layer, ctx);
+  }
   text_layer_set_text(customFontTextLayer, itoa(count));
 }
 
@@ -97,6 +112,10 @@ static void init(void) {
   });
   const bool animated = true;
   window_stack_push(window, animated);
+
+  draw_layer = layer_create(GRect(0, 0, 144, 168));
+  layer_set_update_proc(draw_layer, update_draw_proc);
+
 }
 
 static void deinit(void) {
