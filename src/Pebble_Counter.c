@@ -4,16 +4,31 @@ static Window *window;
 static TextLayer *customFontTextLayer;
 static Layer *draw_layer;
 static GFont counterFont;
-GContext *ctx;
 int count;
 bool neg;
 
 static void update_draw_proc(Layer *draw_layer, GContext *ctx){
-  // Draw something here using ctx
-  GPoint p0 = GPoint(10, 72);
-  GPoint p1 = GPoint(20, 72);
-  graphics_context_set_stroke_color(ctx, GColorBlack);
-  graphics_draw_line(ctx, p0, p1);
+  GRect minus;
+
+  // readjust the position of the negative sign
+  // automatically readjust deppending on certain incraments
+  // draws an empty rectagle when count is 0
+  minus = GRect(0, 0, 0, 0);
+  if(count <= -1000){
+    minus = GRect(5, 80, 18, 6);
+  }if(count > -1000 && count <= -200){
+    minus = GRect(10, 80, 18, 6);
+  }else if(count > -200 && count <= -100){
+    minus = GRect(15, 80, 18, 6);
+  }else if(count > -100 && count <= -20){
+    minus = GRect(20, 80, 18, 6);
+  }else if(count > -20 && count <= -10){
+    minus = GRect(25, 80, 18, 6);
+  }else if(count > -10 && count <= -1){
+    minus = GRect(20, 80, 18, 6);
+  }
+
+  graphics_fill_rect(ctx, minus, 0, GCornerNone);
 }
 
 char *itoa(int num){
@@ -64,17 +79,21 @@ static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
 
 static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
   count++;
-  if(count < 0){
-    update_draw_proc(draw_layer, ctx);
-  }
+  // if(count < 0){
+  //   update_draw_proc(draw_layer, ctx);
+  // }else if(count == 0){
+  //   layer_destroy(draw_layer);
+  // }
   text_layer_set_text(customFontTextLayer, itoa(count));
 }
 
 static void down_click_handler(ClickRecognizerRef recognizer, void *context) {
   count--;
-  if(count < 0){
-    update_draw_proc(draw_layer, ctx);
-  }
+  // if(count < 0){
+  //   APP_LOG(APP_LOG_LEVEL_DEBUG, "Before update_draw_proc");
+  //   update_draw_proc(draw_layer, ctx);
+  //   APP_LOG(APP_LOG_LEVEL_DEBUG, "After update_draw_proc");
+  // }
   text_layer_set_text(customFontTextLayer, itoa(count));
 }
 
@@ -89,6 +108,7 @@ static void window_load(Window *window) {
   GRect bounds = layer_get_bounds(window_layer);
   count = 0;
 
+  // Text Layer
   customFontTextLayer = text_layer_create(GRect(0, 50, 144, 50));
   text_layer_set_background_color(customFontTextLayer, GColorClear);
   counterFont = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_XPED_48));
@@ -96,11 +116,17 @@ static void window_load(Window *window) {
   text_layer_set_font(customFontTextLayer, counterFont);
   text_layer_set_text(customFontTextLayer, "0");
   text_layer_set_text_alignment(customFontTextLayer, GTextAlignmentCenter);
+
+  // Drawing Layer
+  draw_layer = layer_create(GRect(0, 0, bounds.size.w, bounds.size.h));
+  layer_add_child(window_layer, draw_layer);
+  layer_set_update_proc(draw_layer, update_draw_proc);
 }
 
 static void window_unload(Window *window) {
   fonts_unload_custom_font(counterFont);
   text_layer_destroy(customFontTextLayer);
+  layer_destroy(draw_layer);
 }
 
 static void init(void) {
@@ -115,7 +141,7 @@ static void init(void) {
 
   draw_layer = layer_create(GRect(0, 0, 144, 168));
   layer_set_update_proc(draw_layer, update_draw_proc);
-
+  layer_set_update_proc(draw_layer, update_draw_proc);
 }
 
 static void deinit(void) {
