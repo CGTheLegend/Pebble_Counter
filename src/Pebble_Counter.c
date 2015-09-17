@@ -5,7 +5,6 @@ static TextLayer *customFontTextLayer;
 static Layer *draw_layer;
 static GFont counterFont;
 int count;
-bool neg;
 
 static void update_draw_proc(Layer *draw_layer, GContext *ctx){
   GRect minus;
@@ -38,7 +37,6 @@ char *itoa(int num){
 
   // count how many characters in the number
   if(num > 0) {  // positive
-    neg = false;
 
     while(temp_num) {
       temp_num /= 10;
@@ -52,7 +50,6 @@ char *itoa(int num){
     }
     buff[i] = '\0'; // can't forget the null byte to properly end our string
   }else if(num < 0){          // negative
-    neg = true;
     temp_num = num;
     num = abs(temp_num);
 
@@ -79,21 +76,11 @@ static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
 
 static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
   count++;
-  // if(count < 0){
-  //   update_draw_proc(draw_layer, ctx);
-  // }else if(count == 0){
-  //   layer_destroy(draw_layer);
-  // }
   text_layer_set_text(customFontTextLayer, itoa(count));
 }
 
 static void down_click_handler(ClickRecognizerRef recognizer, void *context) {
   count--;
-  // if(count < 0){
-  //   APP_LOG(APP_LOG_LEVEL_DEBUG, "Before update_draw_proc");
-  //   update_draw_proc(draw_layer, ctx);
-  //   APP_LOG(APP_LOG_LEVEL_DEBUG, "After update_draw_proc");
-  // }
   text_layer_set_text(customFontTextLayer, itoa(count));
 }
 
@@ -150,9 +137,6 @@ static void deinit(void) {
 
 int main(void) {
   init();
-
-  APP_LOG(APP_LOG_LEVEL_DEBUG, "Done initializing, pushed window: %p", window);
-
   app_event_loop();
   deinit();
 }
