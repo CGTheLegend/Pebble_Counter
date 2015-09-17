@@ -71,7 +71,9 @@ char *itoa(int num){
 }
 
 static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
-  /* This button currently does nothing. */
+  /* Resets the count */
+  count = 0;
+  text_layer_set_text(customFontTextLayer, itoa(count));
 }
 
 static void up_click_handler(ClickRecognizerRef recognizer, void *context) {
