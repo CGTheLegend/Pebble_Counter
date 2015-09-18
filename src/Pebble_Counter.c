@@ -1,5 +1,9 @@
 #include <pebble.h>
 
+#define REPEAT_INTERVAL_MS 50
+#define COUNT_PKEY 0
+#define COUNT_DEFAULT 0
+
 static Window *window;
 static TextLayer *customFontTextLayer;
 static Layer *draw_layer;
@@ -72,7 +76,7 @@ char *itoa(int num){
 
 static void select_click_handler(ClickRecognizerRef recognizer, void *context) {
   /* Resets the count */
-  count = 0;
+  count = COUNT_DEFAULT;
   text_layer_set_text(customFontTextLayer, itoa(count));
 }
 
@@ -95,7 +99,6 @@ static void click_config_provider(void *context) {
 static void window_load(Window *window) {
   Layer *window_layer = window_get_root_layer(window);
   GRect bounds = layer_get_bounds(window_layer);
-  count = 0;
 
   // Text Layer
   customFontTextLayer = text_layer_create(GRect(0, 50, 144, 50));
@@ -103,7 +106,7 @@ static void window_load(Window *window) {
   counterFont = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_XPED_48));
   layer_add_child(window_layer, text_layer_get_layer(customFontTextLayer));
   text_layer_set_font(customFontTextLayer, counterFont);
-  text_layer_set_text(customFontTextLayer, "0");
+  text_layer_set_text(customFontTextLayer, itoa(count));
   text_layer_set_text_alignment(customFontTextLayer, GTextAlignmentCenter);
 
   // Drawing Layer
@@ -119,6 +122,10 @@ static void window_unload(Window *window) {
 }
 
 static void init(void) {
+
+  // Get the count from persistent storage for use if it exists, otherwise use the default
+  count = persist_exists(COUNT_PKEY) ? persist_read_int(COUNT_PKEY) : COUNT_DEFAULT;
+
   window = window_create();
   window_set_click_config_provider(window, click_config_provider);
   window_set_window_handlers(window, (WindowHandlers) {
@@ -134,6 +141,8 @@ static void init(void) {
 }
 
 static void deinit(void) {
+  // Save the count into persistent storage on app exit
+  persist_write_int(COUNT_PKEY, count);
   window_destroy(window);
 }
 
